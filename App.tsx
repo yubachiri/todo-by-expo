@@ -3,6 +3,7 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
+  Text,
   TextInput
 } from 'react-native';
 import TodoItem from './components/TodoItem'
@@ -13,6 +14,7 @@ import {
 } from 'react-native-paper';
 
 import firebaseApp from './functions/firebaseConfig'
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export interface Todo {
   id: string
@@ -21,6 +23,8 @@ export interface Todo {
 }
 
 export default function App() {
+  const [user, loading, error] = useAuthState(firebaseApp.auth())
+
   const [todo, setTodo] = React.useState<Todo[]>([]);
   // const [completed, setCompleted] = React.useState<Todo[]>([]);
   const [value, onChangeText] = React.useState<string>('');
@@ -97,6 +101,10 @@ export default function App() {
             >
               追加する
             </Button>
+
+            <Text>
+              {!loading && !error && user?.uid}
+            </Text>
           </Card.Content>
         </Card>
 
