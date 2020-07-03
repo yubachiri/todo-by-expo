@@ -1,12 +1,16 @@
 import React, {useEffect} from 'react';
 import {
-  Button,
   FlatList,
   SafeAreaView,
   StyleSheet,
   TextInput
 } from 'react-native';
 import TodoItem from './components/TodoItem'
+import {
+  Provider,
+  Button,
+  Card
+} from 'react-native-paper';
 
 import firebaseApp from './functions/firebaseConfig'
 
@@ -19,7 +23,7 @@ export interface Todo {
 export default function App() {
   const [todo, setTodo] = React.useState<Todo[]>([]);
   // const [completed, setCompleted] = React.useState<Todo[]>([]);
-  const [value, onChangeText] = React.useState<string>('text');
+  const [value, onChangeText] = React.useState<string>('');
   const db = firebaseApp.firestore();
   firebaseApp.auth().signInAnonymously()
 
@@ -76,52 +80,63 @@ export default function App() {
   }, [])
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Button title={"refetch"} onPress={fetchTodo}/>
-
-      <TextInput
-        style={styles.textInput}
-        onChangeText={onChangeText}
-        value={value}
-        placeholder={'TODO'}
-      />
-
-      {/*未完のTODO*/}
-      <FlatList
-        data={todo}
-        renderItem={({item}) => {
-          return (
-            <TodoItem
-              todo={item}
-              text={item.content}
-              handleTodoStatus={(todo, value) => {
-                handleDone(todo, value)
-                fetchTodo()
-              }}
+    <Provider>
+      <SafeAreaView style={styles.container}>
+        <Card style={styles.card}>
+          <Card.Content style={styles.centered}>
+            <TextInput
+              style={styles.textInput}
+              onChangeText={onChangeText}
+              value={value}
+              placeholder={'TODO'}
             />
-          )
-        }}
-        keyExtractor={item => item.id}
-      />
 
-      {/*完了済みのTODO*/}
-      {/*<FlatList*/}
-      {/*  data={completed}*/}
-      {/*  renderItem={({item}) => {*/}
-      {/*    return (*/}
-      {/*      <TodoItem*/}
-      {/*        todo={item}*/}
-      {/*        text={item.content}*/}
-      {/*        handleTodoStatus={(todo, value) => {*/}
-      {/*          handleDone(todo, value)*/}
-      {/*          fetchTodo()*/}
-      {/*        }}*/}
-      {/*      />*/}
-      {/*    )*/}
-      {/*  }}*/}
-      {/*  keyExtractor={item => item.id}*/}
-      {/*/>*/}
-    </SafeAreaView>
+            <Button
+              mode={"contained"}
+              style={styles.addButton}
+            >
+              追加する
+            </Button>
+          </Card.Content>
+        </Card>
+
+        {/*未完のTODO*/}
+        <FlatList
+          data={todo}
+          renderItem={({item}) => {
+            return (
+              <TodoItem
+                todo={item}
+                text={item.content}
+                handleTodoStatus={(todo, value) => {
+                  handleDone(todo, value)
+                  fetchTodo()
+                }}
+              />
+            )
+          }}
+          keyExtractor={item => item.id}
+        />
+
+        {/*完了済みのTODO*/}
+        {/*<FlatList*/}
+        {/*  data={completed}*/}
+        {/*  renderItem={({item}) => {*/}
+        {/*    return (*/}
+        {/*      <TodoItem*/}
+        {/*        todo={item}*/}
+        {/*        text={item.content}*/}
+        {/*        handleTodoStatus={(todo, value) => {*/}
+        {/*          handleDone(todo, value)*/}
+        {/*          fetchTodo()*/}
+        {/*        }}*/}
+        {/*      />*/}
+        {/*    )*/}
+        {/*  }}*/}
+        {/*  keyExtractor={item => item.id}*/}
+        {/*/>*/}
+      </SafeAreaView>
+    </Provider>
   );
 }
 
@@ -136,7 +151,17 @@ const styles = StyleSheet.create({
     borderBottomColor: 'lightgray',
     borderBottomWidth: 1,
     height: 40,
-    minWidth: '50%',
+    width: 150,
     paddingHorizontal: 10
+  },
+  addButton: {
+    margin: 20
+  },
+  card: {
+    width: '80%',
+    maxHeight: 300
+  },
+  centered: {
+    alignItems: 'center'
   }
 });
