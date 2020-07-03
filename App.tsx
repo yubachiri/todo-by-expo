@@ -4,6 +4,7 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
+  TextInput
 } from 'react-native';
 import TodoItem from './components/TodoItem'
 
@@ -17,8 +18,10 @@ export interface Todo {
 
 export default function App() {
   const [todo, setTodo] = React.useState<Todo[]>([]);
-  const [completed, setCompleted] = React.useState<Todo[]>([]);
+  // const [completed, setCompleted] = React.useState<Todo[]>([]);
+  const [value, onChangeText] = React.useState<string>('text');
   const db = firebaseApp.firestore();
+  firebaseApp.auth().signInAnonymously()
 
   const fetchTodo = async () => {
     const todos: Todo[] = []
@@ -41,21 +44,21 @@ export default function App() {
     setTodo(todos)
 
     // FIXME: サボってコピペした 共通化したい
-    const completedSnapshot = await db.collection("tweets")
-      .where("done", "==", true)
-      .get()
-
-    completedSnapshot.forEach((doc) => {
-      const {content, done} = doc.data()
-      const todo = {
-        id: doc.id,
-        content: content || "contentが取得できませんでした",
-        done: done || true
-      }
-      completeds.push(todo)
-    })
-
-    setCompleted(completeds)
+    // const completedSnapshot = await db.collection("tweets")
+    //   .where("done", "==", true)
+    //   .get()
+    //
+    // completedSnapshot.forEach((doc) => {
+    //   const {content, done} = doc.data()
+    //   const todo = {
+    //     id: doc.id,
+    //     content: content || "contentが取得できませんでした",
+    //     done: done || true
+    //   }
+    //   completeds.push(todo)
+    // })
+    //
+    // setCompleted(completeds)
   }
 
   const handleDone = (todo: Todo, status: boolean) => {
@@ -76,6 +79,13 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <Button title={"refetch"} onPress={fetchTodo}/>
 
+      <TextInput
+        style={styles.textInput}
+        onChangeText={onChangeText}
+        value={value}
+        placeholder={'TODO'}
+      />
+
       {/*未完のTODO*/}
       <FlatList
         data={todo}
@@ -95,22 +105,22 @@ export default function App() {
       />
 
       {/*完了済みのTODO*/}
-      <FlatList
-        data={completed}
-        renderItem={({item}) => {
-          return (
-            <TodoItem
-              todo={item}
-              text={item.content}
-              handleTodoStatus={(todo, value) => {
-                handleDone(todo, value)
-                fetchTodo()
-              }}
-            />
-          )
-        }}
-        keyExtractor={item => item.id}
-      />
+      {/*<FlatList*/}
+      {/*  data={completed}*/}
+      {/*  renderItem={({item}) => {*/}
+      {/*    return (*/}
+      {/*      <TodoItem*/}
+      {/*        todo={item}*/}
+      {/*        text={item.content}*/}
+      {/*        handleTodoStatus={(todo, value) => {*/}
+      {/*          handleDone(todo, value)*/}
+      {/*          fetchTodo()*/}
+      {/*        }}*/}
+      {/*      />*/}
+      {/*    )*/}
+      {/*  }}*/}
+      {/*  keyExtractor={item => item.id}*/}
+      {/*/>*/}
     </SafeAreaView>
   );
 }
@@ -122,4 +132,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  textInput: {
+    borderBottomColor: 'lightgray',
+    borderBottomWidth: 1,
+    height: 40,
+    minWidth: '50%',
+    paddingHorizontal: 10
+  }
 });
