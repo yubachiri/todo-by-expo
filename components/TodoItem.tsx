@@ -6,25 +6,22 @@ import {Todo} from '../App'
 interface Props {
   todo: Todo
   text: string
-  handleTodoStatus: (todo: Todo, value: boolean) => void
+  handleDone: () => void
 }
 
-const TodoItem: React.FC<Props> = ({ todo, text, handleTodoStatus }) => {
+const TodoItem: React.FC<Props> = ({ todo, text, handleDone }) => {
   const [isEnabled, setIsEnabled] = React.useState(todo.done);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   return (
     <View style={styles.item}>
       <Switch
-        // trackColor={{ false: "#767577", true: "#81b0ff" }}
-        // thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
-        onValueChange={(value) => {
+        onValueChange={() => {
           toggleSwitch()
-          handleTodoStatus(todo, value)
+          handleDone()
         }}
         value={isEnabled}
-        // style={styles.switch}
       />
       <Text style={styles.text}>{text}</Text>
     </View>
@@ -44,10 +41,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 8,
     marginHorizontal: 16,
-    // shadowOpacity: 0.75,
-    // shadowRadius: 5,
-    // shadowColor: 'black',
-    // shadowOffset: { height: 5, width: 5 },
     borderBottomColor: 'lightgray',
     borderBottomWidth: 1,
 

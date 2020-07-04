@@ -12,10 +12,11 @@ import {
   Button,
   Card
 } from 'react-native-paper';
-import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
+import {vw, vh, vmin, vmax} from 'react-native-expo-viewport-units';
 
 import firebaseApp from './functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
+import {User} from "firebase";
 
 const db = firebaseApp.firestore()
 
@@ -38,6 +39,20 @@ const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fet
     })
 
   setTodo('')
+  fetchTodo()
+}
+
+const handleDone = async (todo: Todo, user: User, fetchTodo: () => void) => {
+  await db
+    .collection("todos")
+    .doc(user.uid)
+    .collection("todos")
+    .doc(todo.id)
+    .set({
+      content: todo.content,
+      done: true
+    })
+
   fetchTodo()
 }
 
@@ -95,16 +110,6 @@ export default function App() {
     // setCompleted(completeds)
   }
 
-  const handleDone = (todo: Todo, status: boolean) => {
-    db
-      .collection("tweets")
-      .doc(todo.id)
-      .set({
-        content: todo.content,
-        done: status
-      })
-  }
-
   useEffect(() => {
     fetchTodo()
   }, [user])
@@ -123,7 +128,6 @@ export default function App() {
 
             <Button
               mode={"contained"}
-              style={styles.addButton}
               onPress={() => addTodo(todo, user?.uid || '', setTodo, fetchTodo)}
             >
               追加する
@@ -140,9 +144,11 @@ export default function App() {
                   <TodoItem
                     todo={item}
                     text={item.content}
-                    handleTodoStatus={(todo, value) => {
-                      handleDone(todo, value)
-                      fetchTodo()
+                    handleDone={() => {
+                      if (!user) {
+                        return
+                      }
+                      handleDone(item, user, fetchTodo)
                     }}
                   />
                 )
@@ -188,10 +194,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     height: 40,
     width: 150,
-    paddingHorizontal: 10
-  },
-  addButton: {
-    margin: 20
+    paddingHorizontal: 10,
+    margin: 15
   },
   card: {
     width: vw(90),
