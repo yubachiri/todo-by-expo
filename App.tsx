@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {Dispatch, useEffect} from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -14,7 +14,9 @@ import {
 } from 'react-native-paper';
 
 import firebaseApp from './functions/firebaseConfig'
-import { useAuthState } from "react-firebase-hooks/auth";
+import {useAuthState} from "react-firebase-hooks/auth";
+
+const db = firebaseApp.firestore()
 
 export interface Todo {
   id: string
@@ -22,12 +24,28 @@ export interface Todo {
   done: boolean
 }
 
+const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fetchTodo: () => void) => {
+  console.log('呼ばれた: ' + text)
+
+  await db
+    .collection('todos')
+    .doc(uid)
+    .collection('todos')
+    .add({
+      content: text,
+      done: false
+    })
+
+  setTodo('')
+  fetchTodo()
+}
+
 export default function App() {
   const [user, loading, error] = useAuthState(firebaseApp.auth())
 
-  const [todo, setTodo] = React.useState<Todo[]>([]);
+  const [todo, setTodo] = React.useState<string>('');
+  const [todos, setTodos] = React.useState<Todo[]>([]);
   // const [completed, setCompleted] = React.useState<Todo[]>([]);
-  const [value, onChangeText] = React.useState<string>('');
   const db = firebaseApp.firestore();
   firebaseApp.auth().signInAnonymously()
 
@@ -35,7 +53,14 @@ export default function App() {
     const todos: Todo[] = []
     const completeds: Todo[] = []
 
-    const todoSnapshot = await db.collection("tweets")
+    if (!user) {
+      return
+    }
+
+    const todoSnapshot = await db
+      .collection("todos")
+      .doc(user.uid)
+      .collection("todos")
       .where("done", "==", false)
       .get()
 
@@ -49,7 +74,7 @@ export default function App() {
       todos.push(todo)
     })
 
-    setTodo(todos)
+    setTodos(todos)
 
     // FIXME: サボってコピペした 共通化したい
     // const completedSnapshot = await db.collection("tweets")
@@ -81,7 +106,7 @@ export default function App() {
 
   useEffect(() => {
     fetchTodo()
-  }, [])
+  }, [user])
 
   return (
     <Provider>
@@ -90,14 +115,15 @@ export default function App() {
           <Card.Content style={styles.centered}>
             <TextInput
               style={styles.textInput}
-              onChangeText={onChangeText}
-              value={value}
+              onChangeText={setTodo}
+              value={todo}
               placeholder={'TODO'}
             />
 
             <Button
               mode={"contained"}
               style={styles.addButton}
+              onPress={() => addTodo(todo, user?.uid || '', setTodo, fetchTodo)}
             >
               追加する
             </Button>
@@ -105,26 +131,26 @@ export default function App() {
             <Text>
               {!loading && !error && user?.uid}
             </Text>
+            {/*未完のTODO*/}
+            <FlatList
+              data={todos}
+              renderItem={({item}) => {
+                return (
+                  <TodoItem
+                    todo={item}
+                    text={item.content}
+                    handleTodoStatus={(todo, value) => {
+                      handleDone(todo, value)
+                      fetchTodo()
+                    }}
+                  />
+                )
+              }}
+              keyExtractor={item => item.id}
+              style={styles.list}
+            />
           </Card.Content>
         </Card>
-
-        {/*未完のTODO*/}
-        <FlatList
-          data={todo}
-          renderItem={({item}) => {
-            return (
-              <TodoItem
-                todo={item}
-                text={item.content}
-                handleTodoStatus={(todo, value) => {
-                  handleDone(todo, value)
-                  fetchTodo()
-                }}
-              />
-            )
-          }}
-          keyExtractor={item => item.id}
-        />
 
         {/*完了済みのTODO*/}
         {/*<FlatList*/}
@@ -153,7 +179,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
+    marginTop: 50
   },
   textInput: {
     borderBottomColor: 'lightgray',
@@ -166,10 +193,13 @@ const styles = StyleSheet.create({
     margin: 20
   },
   card: {
-    width: '80%',
-    maxHeight: 300
+    width: '90%',
   },
   centered: {
     alignItems: 'center'
+  },
+  list: {
+    width: '100%',
+    maxHeight: 500
   }
 });
