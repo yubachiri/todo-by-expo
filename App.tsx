@@ -12,6 +12,7 @@ import {
   Button,
   Card
 } from 'react-native-paper';
+import { vw, vh, vmin, vmax } from 'react-native-expo-viewport-units';
 
 import firebaseApp from './functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
@@ -193,13 +194,14 @@ const styles = StyleSheet.create({
     margin: 20
   },
   card: {
-    width: '90%',
+    width: vw(90),
+    maxHeight: vh(80)
   },
   centered: {
     alignItems: 'center'
   },
   list: {
     width: '100%',
-    maxHeight: 500
+    maxHeight: vh(50)
   }
 });
