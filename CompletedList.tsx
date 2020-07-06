@@ -11,45 +11,17 @@ import {
 import {vw, vh} from 'react-native-expo-viewport-units';
 import TodoItem from './components/TodoItem'
 import {Todo} from "./App";
+import {fetchTodo} from "./functions/utils";
 
 import firebaseApp from './functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
 
 export default function TodoList() {
   const [user, loading, error] = useAuthState(firebaseApp.auth())
-
   const [todos, setTodos] = React.useState<Todo[]>([]);
-  const db = firebaseApp.firestore();
-
-  const fetchTodo = async () => {
-    if (!user) {
-      return
-    }
-
-    const todos: Todo[] = []
-
-    const todoSnapshot = await db
-      .collection("todos")
-      .doc(user.uid)
-      .collection("todos")
-      .where("done", "==", true)
-      .get()
-
-    todoSnapshot.forEach((doc) => {
-      const {content, done} = doc.data()
-      const todo = {
-        id: doc.id,
-        content: content || "contentが取得できませんでした",
-        done: done || true
-      }
-      todos.push(todo)
-    })
-
-    setTodos(todos)
-  }
 
   useEffect(() => {
-    fetchTodo()
+    fetchTodo(user, setTodos)
   }, [user])
 
   return (

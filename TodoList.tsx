@@ -3,7 +3,6 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Text,
   TextInput
 } from 'react-native';
 import {
@@ -14,12 +13,11 @@ import {
 import {vw, vh} from 'react-native-expo-viewport-units';
 import TodoItem from './components/TodoItem'
 import {Todo} from "./App";
+import {fetchTodo} from "./functions/utils";
 
-import firebaseApp from './functions/firebaseConfig'
+import firebaseApp, {db} from './functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
 import {User} from "firebase";
-
-const db = firebaseApp.firestore()
 
 const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fetchTodo: () => void) => {
   await db
@@ -51,40 +49,11 @@ const handleDone = async (todo: Todo, user: User, fetchTodo: () => void) => {
 
 export default function TodoList() {
   const [user, loading, error] = useAuthState(firebaseApp.auth())
-
   const [todo, setTodo] = React.useState<string>('');
   const [todos, setTodos] = React.useState<Todo[]>([]);
-  const db = firebaseApp.firestore();
-
-  const fetchTodo = async () => {
-    if (!user) {
-      return
-    }
-
-    const todos: Todo[] = []
-
-    const todoSnapshot = await db
-      .collection("todos")
-      .doc(user.uid)
-      .collection("todos")
-      .where("done", "==", false)
-      .get()
-
-    todoSnapshot.forEach((doc) => {
-      const {content, done} = doc.data()
-      const todo = {
-        id: doc.id,
-        content: content || "contentが取得できませんでした",
-        done: done || false
-      }
-      todos.push(todo)
-    })
-
-    setTodos(todos)
-  }
 
   useEffect(() => {
-    fetchTodo()
+    fetchTodo(user, setTodos)
   }, [user])
 
   return (
