@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderBottomColor: 'lightgray',
     borderBottomWidth: 1,
-
   },
   text: {
     width: 260,

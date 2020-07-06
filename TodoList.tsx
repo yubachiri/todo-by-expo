@@ -20,12 +20,6 @@ import {User} from "firebase";
 
 const db = firebaseApp.firestore()
 
-export interface Todo {
-  id: string
-  content: string
-  done: boolean
-}
-
 const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fetchTodo: () => void) => {
   await db
     .collection('todos')

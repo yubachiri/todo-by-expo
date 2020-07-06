@@ -9,6 +9,12 @@ import TodoList from './TodoList'
 
 import firebaseApp from './functions/firebaseConfig'
 
+export interface Todo {
+  id: string
+  content: string
+  done: boolean
+}
+
 function SettingsScreen() {
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
