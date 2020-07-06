@@ -6,23 +6,31 @@ import {Todo} from '../App'
 interface Props {
   todo: Todo
   text: string
-  handleDone: () => void
+  handleDone?: () => void
 }
 
 const TodoItem: React.FC<Props> = ({ todo, text, handleDone }) => {
   const [isEnabled, setIsEnabled] = React.useState(todo.done);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
+  const switchComponent = () => {
+    if(!!handleDone) {
+      return (
+        <Switch
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={() => {
+            toggleSwitch()
+            handleDone()
+          }}
+          value={isEnabled}
+        />
+      )
+    }
+  }
+
   return (
     <View style={styles.item}>
-      <Switch
-        ios_backgroundColor="#3e3e3e"
-        onValueChange={() => {
-          toggleSwitch()
-          handleDone()
-        }}
-        value={isEnabled}
-      />
+      {switchComponent()}
       <Text style={styles.text}>{text}</Text>
     </View>
   );

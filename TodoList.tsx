@@ -13,6 +13,7 @@ import {
 } from 'react-native-paper';
 import {vw, vh} from 'react-native-expo-viewport-units';
 import TodoItem from './components/TodoItem'
+import {Todo} from "./App";
 
 import firebaseApp from './functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
@@ -105,10 +106,6 @@ export default function TodoList() {
               追加する
             </Button>
 
-            <Text>
-              {!loading && !error && user?.uid}
-            </Text>
-
             <FlatList
               data={todos}
               renderItem={({item}) => {
@@ -140,7 +137,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    marginTop: 50
   },
   textInput: {
     borderBottomColor: 'lightgray',
@@ -152,13 +148,14 @@ const styles = StyleSheet.create({
   },
   card: {
     width: vw(90),
-    maxHeight: vh(80)
+    maxHeight: vh(90),
+    marginTop: 20
   },
   centered: {
     alignItems: 'center'
   },
   list: {
     width: '100%',
-    maxHeight: vh(50)
+    maxHeight: vh(70)
   }
 });
