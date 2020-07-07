@@ -71,7 +71,7 @@ export default function TodoList() {
 
             <Button
               mode={"contained"}
-              onPress={() => addTodo(todo, user?.uid || '', setTodo, fetchTodo)}
+              onPress={() => addTodo(todo, user?.uid || '', setTodo, setTodos, fetchTodo)}
             >
               追加する
             </Button>
