@@ -1,8 +1,8 @@
 import {Todo} from "../App";
 import {db} from "./firebaseConfig";
 
-export const fetchTodo = async (user, setTodos) => {
-  if (!user) {
+export const fetchTodo = async (uid, setTodos, status: boolean) => {
+  if (!uid) {
     return
   }
 
@@ -10,9 +10,9 @@ export const fetchTodo = async (user, setTodos) => {
 
   const todoSnapshot = await db
     .collection("todos")
-    .doc(user.uid)
+    .doc(uid)
     .collection("todos")
-    .where("done", "==", false)
+    .where("done", "==", status)
     .get()
 
   todoSnapshot.forEach((doc) => {

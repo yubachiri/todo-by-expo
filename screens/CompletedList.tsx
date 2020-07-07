@@ -21,7 +21,8 @@ export default function TodoList() {
   const [todos, setTodos] = React.useState<Todo[]>([]);
 
   useEffect(() => {
-    fetchTodo(user, setTodos)
+    if(!user) { return }
+    fetchTodo(user.uid, setTodos, true)
   }, [user])
 
   return (

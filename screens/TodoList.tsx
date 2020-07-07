@@ -19,7 +19,7 @@ import firebaseApp, {db} from '../functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
 import {User} from "firebase";
 
-const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fetchTodo: () => void) => {
+const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, setTodos, fetchTodo) => {
   await db
     .collection('todos')
     .doc(uid)
@@ -30,10 +30,10 @@ const addTodo = async (text: string, uid: string, setTodo: Dispatch<string>, fet
     })
 
   setTodo('')
-  fetchTodo()
+  fetchTodo(uid, setTodos, false)
 }
 
-const handleDone = async (todo: Todo, user: User, fetchTodo: () => void) => {
+const handleDone = async (todo: Todo, user: User, fetchTodo, setTodos) => {
   await db
     .collection("todos")
     .doc(user.uid)
@@ -44,7 +44,7 @@ const handleDone = async (todo: Todo, user: User, fetchTodo: () => void) => {
       done: true
     })
 
-  fetchTodo()
+  fetchTodo(user.uid, setTodos, false)
 }
 
 export default function TodoList() {
@@ -53,7 +53,8 @@ export default function TodoList() {
   const [todos, setTodos] = React.useState<Todo[]>([]);
 
   useEffect(() => {
-    fetchTodo(user, setTodos)
+    if(!user) { return }
+    fetchTodo(user.uid, setTodos, false)
   }, [user])
 
   return (
@@ -86,7 +87,7 @@ export default function TodoList() {
                       if (!user) {
                         return
                       }
-                      handleDone(item, user, fetchTodo)
+                      handleDone(item, user, fetchTodo, setTodos)
                     }}
                   />
                 )
