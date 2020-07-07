@@ -1,8 +1,8 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import TodoList from './TodoList'
-import CompletedList from './CompletedList'
+import TodoList from './screens/TodoList'
+import CompletedList from './screens/CompletedList'
 
 import firebaseApp from './functions/firebaseConfig'
 

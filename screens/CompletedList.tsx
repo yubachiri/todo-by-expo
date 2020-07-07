@@ -9,11 +9,11 @@ import {
   Card
 } from 'react-native-paper';
 import {vw, vh} from 'react-native-expo-viewport-units';
-import TodoItem from './components/TodoItem'
-import {Todo} from "./App";
-import {fetchTodo} from "./functions/utils";
+import TodoItem from '../components/TodoItem'
+import {Todo} from "../App";
+import {fetchTodo} from "../functions/utils";
 
-import firebaseApp from './functions/firebaseConfig'
+import firebaseApp from '../functions/firebaseConfig'
 import {useAuthState} from "react-firebase-hooks/auth";
 
 export default function TodoList() {
